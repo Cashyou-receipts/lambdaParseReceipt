@@ -1,4 +1,4 @@
-require "environment"
+require_relative "environment"
 require "faraday"
 require "google-cloud-vision"
 
@@ -15,13 +15,14 @@ class VisionApiService
     @object_key = object_key
   end
 
-  def make_text_detection_http_call
+  def make_text_detection_http_call!
     vision_url = "https://vision.googleapis.com"
     conn = create_connection(vision_url)
-    image_url = build_aws_url(object_key: @object_key)
+    image_url = build_aws_url
     body = build_text_detection_request_body(image_url)
     endpoint = "/v1/images:annotate?key=#{API_KEY}"
     response = conn.post(endpoint, body)
+    response.body.is_a?(Hash) ? response.body : JSON.parse(response.body)
   end
   
   private

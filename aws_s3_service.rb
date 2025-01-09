@@ -1,4 +1,5 @@
 require "aws-sdk-s3"
+require_relative "environment.rb"
 
 class AwsS3Service
   CLIENT = Aws::S3::Client.new(

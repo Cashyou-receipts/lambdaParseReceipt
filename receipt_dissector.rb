@@ -4,14 +4,14 @@ class ReceiptDissector
   ERROR_MARGIN = 0.01
 
   def initialize(vision_api_response)
-    @data = JSON.parse(vision_api_response)
+    @data = vision_api_response
     @full_text = @data["responses"].first["textAnnotations"].first["description"].downcase
   end
 
   def identify_vendor
     sanitized_text = @full_text.gsub(/\n+/, " ")
     ## Placeholder
-    vendor_names = ["Safeway", "King Soopers". "Costco"]
+    vendor_names = ["Safeway", "King Soopers", "Costco"]
     match_data = sanitized_text.match(vendor_names)
     match_data[1] if match_data
   end
