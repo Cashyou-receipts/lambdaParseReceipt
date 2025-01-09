@@ -3,3 +3,4 @@ delete_receipt.rb
 upload_receipt.rb
 costco_receipt.rb
 lambda_runner.rb
+.DS_store
