@@ -1,0 +1,19 @@
+current directory: /Users/dysonbreakstone/coding/projects/receipt_tracker/lambdaParseReceipt/vendor/bundle/ruby/3.2.0/gems/racc-1.8.1/ext/racc/cparse
+/Users/dysonbreakstone/.rbenv/versions/3.2.2/bin/ruby extconf.rb
+creating Makefile
+
+current directory: /Users/dysonbreakstone/coding/projects/receipt_tracker/lambdaParseReceipt/vendor/bundle/ruby/3.2.0/gems/racc-1.8.1/ext/racc/cparse
+make DESTDIR\= sitearchdir\=./.gem.20250109-57900-46fcqs sitelibdir\=./.gem.20250109-57900-46fcqs clean
+
+current directory: /Users/dysonbreakstone/coding/projects/receipt_tracker/lambdaParseReceipt/vendor/bundle/ruby/3.2.0/gems/racc-1.8.1/ext/racc/cparse
+make DESTDIR\= sitearchdir\=./.gem.20250109-57900-46fcqs sitelibdir\=./.gem.20250109-57900-46fcqs
+compiling cparse.c
+linking shared-object racc/cparse.bundle
+ld: warning: ignoring duplicate libraries: '-lruby.3.2'
+
+current directory: /Users/dysonbreakstone/coding/projects/receipt_tracker/lambdaParseReceipt/vendor/bundle/ruby/3.2.0/gems/racc-1.8.1/ext/racc/cparse
+make DESTDIR\= sitearchdir\=./.gem.20250109-57900-46fcqs sitelibdir\=./.gem.20250109-57900-46fcqs install
+/usr/bin/install -c -m 0755 cparse.bundle ./.gem.20250109-57900-46fcqs/racc
+
+current directory: /Users/dysonbreakstone/coding/projects/receipt_tracker/lambdaParseReceipt/vendor/bundle/ruby/3.2.0/gems/racc-1.8.1/ext/racc/cparse
+make DESTDIR\= sitearchdir\=./.gem.20250109-57900-46fcqs sitelibdir\=./.gem.20250109-57900-46fcqs clean
