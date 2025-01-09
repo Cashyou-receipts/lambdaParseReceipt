@@ -1,5 +1,5 @@
 require "aws-sdk-s3"
-require_relative "environment.rb"
+# require_relative "../environment.rb"
 
 class AwsS3Service
   CLIENT = Aws::S3::Client.new(
@@ -16,20 +16,6 @@ class AwsS3Service
 
   def list_objects(bucket:)
     CLIENT.list_objects_v2(bucket: bucket).contents
-  end
-
-  def upload_receipt!(filename:, object_key:)
-    File.open(filename, "rb") do |file|
-      CLIENT.put_object({
-        body: file,
-        bucket: ENV["S3_BUCKET_NAME"],
-        key: object_key,
-        metadata: {
-          "updload_date"=>Date.today.to_s
-        },
-        content_type: "image/jpg"
-      })
-    end
   end
 
   def delete_receipt(keys:)

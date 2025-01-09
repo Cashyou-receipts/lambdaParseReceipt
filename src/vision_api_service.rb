@@ -1,4 +1,4 @@
-require_relative "environment"
+# require_relative "../environment"
 require "faraday"
 require "google-cloud-vision"
 

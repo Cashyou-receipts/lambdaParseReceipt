@@ -10,7 +10,8 @@ class ReceiptDissector
 
   def identify_vendor
     sanitized_text = @full_text.gsub(/\n+/, " ")
-    ## Placeholder
+    ## TODO
+    # Replace vendor_names with a collection of user vendors
     vendor_names = ["Safeway", "King Soopers", "Costco"]
     match_data = sanitized_text.match(vendor_names)
     match_data[1] if match_data

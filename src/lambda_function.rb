@@ -4,6 +4,7 @@ $VERBOSE = nil
 require_relative 'direct_reporter'
 
 def lambda_handler(event:, context:)
+  event
   reporter = DirectReporter.new
   reporter.text_balance_to_person!(event[:phone_number], event[:object_key])
 end
