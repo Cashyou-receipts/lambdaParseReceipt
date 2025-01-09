@@ -9,17 +9,17 @@ checking for whether -std=c99 is accepted as CFLAGS... yes
 creating Makefile
 
 current directory: /Users/dysonbreakstone/coding/projects/receipt_tracker/lambdaParseReceipt/vendor/bundle/ruby/3.2.0/gems/json-2.9.1/ext/json/ext/parser
-make DESTDIR\= sitearchdir\=./.gem.20250108-40412-we5jo5 sitelibdir\=./.gem.20250108-40412-we5jo5 clean
+make DESTDIR\= sitearchdir\=./.gem.20250108-45407-kro7c2 sitelibdir\=./.gem.20250108-45407-kro7c2 clean
 
 current directory: /Users/dysonbreakstone/coding/projects/receipt_tracker/lambdaParseReceipt/vendor/bundle/ruby/3.2.0/gems/json-2.9.1/ext/json/ext/parser
-make DESTDIR\= sitearchdir\=./.gem.20250108-40412-we5jo5 sitelibdir\=./.gem.20250108-40412-we5jo5
+make DESTDIR\= sitearchdir\=./.gem.20250108-45407-kro7c2 sitelibdir\=./.gem.20250108-45407-kro7c2
 compiling parser.c
 linking shared-object json/ext/parser.bundle
 ld: warning: ignoring duplicate libraries: '-lruby.3.2'
 
 current directory: /Users/dysonbreakstone/coding/projects/receipt_tracker/lambdaParseReceipt/vendor/bundle/ruby/3.2.0/gems/json-2.9.1/ext/json/ext/parser
-make DESTDIR\= sitearchdir\=./.gem.20250108-40412-we5jo5 sitelibdir\=./.gem.20250108-40412-we5jo5 install
-/usr/bin/install -c -m 0755 parser.bundle ./.gem.20250108-40412-we5jo5/json/ext
+make DESTDIR\= sitearchdir\=./.gem.20250108-45407-kro7c2 sitelibdir\=./.gem.20250108-45407-kro7c2 install
+/usr/bin/install -c -m 0755 parser.bundle ./.gem.20250108-45407-kro7c2/json/ext
 
 current directory: /Users/dysonbreakstone/coding/projects/receipt_tracker/lambdaParseReceipt/vendor/bundle/ruby/3.2.0/gems/json-2.9.1/ext/json/ext/parser
-make DESTDIR\= sitearchdir\=./.gem.20250108-40412-we5jo5 sitelibdir\=./.gem.20250108-40412-we5jo5 clean
+make DESTDIR\= sitearchdir\=./.gem.20250108-45407-kro7c2 sitelibdir\=./.gem.20250108-45407-kro7c2 clean
