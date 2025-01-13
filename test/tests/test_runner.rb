@@ -1,5 +1,8 @@
-require_relative './test_object'
-require_relative './test_tester'
+require './test/tests/test_helper'
+
+Dir.glob(File.join(__dir__, "/*.rb")).each do |file|
+  require_relative file
+end
 
 class TestRunner
   def self.test(test_klass = nil, test_name = nil)
@@ -11,9 +14,10 @@ class TestRunner
           tester.respond_to?(test_name) ? tester.send(test_name) : (puts "No such test")
         else
           begin
-            tester.new.run_tests
+            tester.run_tests
           rescue => exception
-            puts "run_tests method not defined or something else went wrong"
+            puts "    run_tests method not defined or something else went wrong"
+            puts "        #{exception}" if exception
           end
         end
       else
