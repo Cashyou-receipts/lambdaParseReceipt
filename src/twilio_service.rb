@@ -10,10 +10,11 @@ class TwilioService
   end
 
   def send_message!(phone_number, message)
-    @client.messages.create(
+    success = @client.messages.create(
       from: @from,
       to: phone_number,
       body: message
     )
+    success
   end
 end

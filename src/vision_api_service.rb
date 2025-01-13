@@ -1,6 +1,6 @@
 # require_relative "../environment"
 require "faraday"
-require "google-cloud-vision"
+# require "google-cloud-vision"
 
 class VisionApiService
   # TODO when deployed, configure app to utilize json for authentication

@@ -7,10 +7,11 @@ class DirectReporter
   def text_balance_to_person!(phone_number, object_key)
     message = create_message(object_key)
     twilio = TwilioService.new
-    twilio.send_message!("+18025950053", message)
+    success = twilio.send_message!(phone_number, message)
+    success
   end
 
-  def create_message
+  def create_message(object_key)
     vision = VisionApiService.new(object_key)
     dissector = ReceiptDissector.new(vision.make_text_detection_http_call!)
   
