@@ -13,6 +13,14 @@ class TestObject
     end
   end
 
+  def assert(assertion, message = nil)
+    if assertion
+      puts "    PASSED! :D\n\n"
+    else
+      puts "    FAILURE - #{message || 'test method return false.'}\n\n"
+    end
+  end
+
   def run_tests
     tests = 0
     failures = 0
