@@ -58,9 +58,9 @@ class ReceiptDissector
         if matching_items.any? { |item| item["description"].downcase.match?(/^(?:tax|subtotal)/) }
           break
         elsif matching_items.any? { |item| item["description"].match?(/^-$/) && within_horizontal_margin?(item, num_poly) }
-          @deductions[description] = num_poly["description"].match(CATEGORIES["price"])[1]
+          @deductions[description.downcase] = num_poly["description"].match(CATEGORIES["price"])[1]
         else
-          @items[description] = num_poly["description"].match(CATEGORIES["price"])[1]
+          @items[description.downcase] = num_poly["description"].match(CATEGORIES["price"])[1]
         end
       end
     end

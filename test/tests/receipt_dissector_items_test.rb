@@ -19,8 +19,9 @@ class ReceiptDissectorItemsTest < TestObject
       "ginger beer"=>"15.99"
     }
     dissector.parse_receipt
-    require 'pry'; binding.pry
-    # assert_same(items.sort, dissector.items.sort)
+
+    assert_same(items.count, dissector.items.count)
+    assert_same(items.values.sort, dissector.items.values.sort)
   end
 
   def response_contents(vendor)
