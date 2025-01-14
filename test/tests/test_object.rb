@@ -8,7 +8,7 @@ class TestObject
       puts "    PASSED! :D\n\n"
       true
     else
-      puts "    FAILURE - #{message}\n    ASSERTION: #{assertion}\n    Actual: #{actual}\n\n"
+      puts "    FAILURE - #{message}\n    ASSERTION: #{assertion.to_s[0..100]}\n    Actual: #{actual.to_s[0..100]}\n\n"
       false
     end
   end

@@ -7,3 +7,5 @@ end
 Dir.glob(File.join(__dir__, "/*.rb")).each do |file|
   require_relative file unless file.include?('test_object.rb')
 end
+
+# TestRunner.test "ReceiptDissectorItemsTest"

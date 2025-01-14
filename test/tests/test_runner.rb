@@ -9,15 +9,15 @@ class TestRunner
     if test_klass
       if Object.const_defined?(test_klass)
         tester = Object.const_get(test_klass).new
-        puts "RUNNING TEST #{test_name}"
         if test_name
+          puts "RUNNING TEST #{test_name}"
           tester.respond_to?(test_name) ? tester.send(test_name) : (puts "No such test")
         else
           begin
             tester.run_tests
           rescue => exception
             puts "    run_tests method not defined or something else went wrong"
-            puts "        #{exception}" if exception
+            puts "        #{exception.to_s[0..100]}" if exception
           end
         end
       else
