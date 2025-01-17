@@ -17,7 +17,8 @@ class TestRunner
             tester.run_tests
           rescue => exception
             puts "    run_tests method not defined or something else went wrong"
-            puts "        #{exception.to_s[0..100]}" if exception
+            puts "        #{exception.message.to_s[0..100]}" if exception
+            puts "        #{exception.backtrace.to_s[0..200]}" if exception
           end
         end
       else
