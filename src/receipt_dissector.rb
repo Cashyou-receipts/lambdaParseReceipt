@@ -75,10 +75,10 @@ class ReceiptDissector
       words = blocks[description_start_index..].select { |block| block["description"].match? CATEGORIES["item"]}
 
       if words.any? { |word|  word["description"].downcase.match?(CATEGORIES["subtotal"]) }
-        @subtotal = price
+        @subtotal = price["description"]
         next
       elsif words.any? { |word|  word["description"].downcase.match?(CATEGORIES["tax"]) }
-        @tax = price
+        @tax = price["description"]
         next
       end
 
