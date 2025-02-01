@@ -11,5 +11,3 @@ end
 # paste the following lines into an irb session:
 # require './test/tests/test_runner'
 # TestRunner.test "ReceiptDissectorItemsTest"
-# TestRunner.test(*args)
-# require './test/tests/test_runner'; TestRunner.test "ReceiptDissectorItemsTest"
