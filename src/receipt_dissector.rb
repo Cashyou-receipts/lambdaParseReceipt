@@ -1,9 +1,9 @@
 require 'json'
 
 class ReceiptDissector
-  ERROR_MARGIN = 1.5
+  ERROR_MARGIN = 1.8
   HORIZONTAL_MARGIN_MULTIPLIER = 1.5
-  CATEGORIES = { "balance"=>/(balance|total)(\W|$|\s)/, "deduction"=>/^(?=.*-)\$?(\d{1,3}(?:,\d{3})*\.\d{2})$/, "price"=>/^(?!.*[\-@\/])\$?(\d{1,3}(?:,\d{3})*\.\d{2})$/, "item"=>/[a-zA-Z\/]+/, "price_disqualifier"=>/[\-\/@]/, "tax"=>/^(?:tax|taxes)(?:$|\s)/, "subtotal"=>/^(?:subtotal|total before|sub total|)(?:$|\s)/ }
+  CATEGORIES = { "balance"=>/(balance|total)(\W|$|\s)/, "deduction"=>/^(?=.*-)\$?(\d{1,3}(?:,\d{3})*\.\d{2})$/, "price"=>/^(?!.*[\-@\/])\$?(\d{1,3}(?:,\d{3})*\.\d{2})$/, "item"=>/[a-zA-Z\/]+/, "price_disqualifier"=>/[\-\/@]/, "tax"=>/^(?:tax|taxes)(?:$|\b)/, "subtotal"=>/^(?:subtotal|total before|sub total)(?:$|\b)/ }
   attr_reader :balance, :items, :subtotal, :tax
 
   def initialize(vision_api_response)
@@ -41,60 +41,57 @@ class ReceiptDissector
     end
 
     @balance = find_total(potential_balance_polys, potential_prices)
-    @items = find_items(potential_prices)
+    lines = receipt_by_line
+    @items = find_items(lines)
 
     {"balance"=>balance, "items"=>items}
   end
 
-  def find_items(potential_prices)
-    item_list = {}
-    last_item_index = 0
-    keep_searching = true
-    potential_prices.each do |num_poly|
-      break if num_poly["description"].match(CATEGORIES["price"])[1] == @balance
-      matching_items = @annotation_polys.select { |poly| fits_on_slope?(poly, num_poly)}
+  def receipt_by_line
+    remaining_polys = @annotation_polys.select { |poly| poly["boundingPoly"]["vertices"][2]["y"] < @balance_poly["boundingPoly"]["vertices"][0]["y"] }
+    prices_sorted_horizontally = remaining_polys.select { |poly| 
+      poly["description"].match?(CATEGORIES["price"]) && !poly["description"].match?(CATEGORIES["deduction"])
+    }.sort_by { |poly| 
+      poly["boundingPoly"]["vertices"][2]["x"] 
+    }.reverse
+    first_price = prices_sorted_horizontally.first
+    line_item_prices = prices_sorted_horizontally.take_while{ |poly| fits_within_vertical_box?(first_price, poly) }.sort_by { |poly| poly["boundingPoly"]["vertices"][0]["y"] }
 
-      next unless matching_items.count > 1
+    lines = []
+    line_item_prices.each do |price|
+      all_line_polys = remaining_polys.select { |poly| fits_on_slope?(price, poly) }
+      lines << { price: price, items: all_line_polys } unless all_line_polys.any? { |poly| poly["description"].match?(CATEGORIES["price_disqualifier"]) && within_horizontal_margin?(price, poly)} 
+    end
+    lines
+  end
 
-      ordered_items = order_by_direction(matching_items, :right)
-      line_price = nil
-      line_price_index = nil
-      item_description = []
+  def find_items(lines)
+    item_list = []
 
-      ordered_items.each_with_index do |poly, i|
-        item_block = []
-        if poly["description"].match?(CATEGORIES["price"])
-          for j in -1..1
-            if ordered_items[i + j]
-              item_block << ordered_items[i + j]["description"]
-            end
-          end
+    lines.each do |line|
+      price = line[:price]
+      blocks = order_by_direction(line[:items], :right)
+      description_start_index = blocks.index(price) + 1
+      words = blocks[description_start_index..].select { |block| block["description"].match? CATEGORIES["item"]}
 
-          unless item_block.any? { |price_candidate| price_candidate.match?(CATEGORIES["price_disqualifier"]) }
-            line_price = poly["description"].match(CATEGORIES["price"])[1]
-            line_price_index = i
-          end
-        end
-      end
-      
-      next unless line_price && line_price_index
-
-      ordered_items.each_with_index do |poly, i|
-        next unless i > line_price_index
-        if poly["description"].downcase.match?(CATEGORIES["subtotal"])
-          keep_searching = false
-          @subtotal = line_price
-        elsif poly["description"].downcase.match?(CATEGORIES["tax"])
-          keep_searching = false
-          @tax = line_price
-        elsif poly["description"].match?(CATEGORIES["item"]) && ((item_description.empty?) || within_horizontal_margin?(poly, ordered_items[i - 1]))
-          item_description << poly["description"]
-        else
-          break
-        end
+      if words.any? { |word|  word["description"].downcase.match?(CATEGORIES["subtotal"]) }
+        @subtotal = price
+        next
+      elsif words.any? { |word|  word["description"].downcase.match?(CATEGORIES["tax"]) }
+        @tax = price
+        next
       end
 
-      item_list[item_description.reverse.join(" ").downcase] = line_price unless !keep_searching
+      description = []
+      words.each_with_index do |word, i|
+        description << word["description"].downcase
+        break if words[i + 1] && !within_horizontal_margin?(words[i + 1], word)
+      end
+
+      next if description.empty?
+      description = description.reverse.join(" ")
+
+      item_list << { description => line[:price]["description"] }
     end
     item_list
   end
@@ -119,14 +116,14 @@ class ReceiptDissector
   def within_horizontal_margin?(poly_1, poly_2)
     vertices_1 = poly_1["boundingPoly"]["vertices"]
     vertices_2 = poly_2["boundingPoly"]["vertices"]
-    margin = (vertices_1[0]["x"].to_f - vertices_2[1]["x"].to_f) / poly_1["description"].length
-    to_the_left = vertices_1[0]["x"] < vertices_2[0]["x"]
+    margin = (vertices_1[0]["x"].to_f - vertices_1[1]["x"].to_f) / poly_1["description"].length
+    to_the_left = vertices_1[0]["x"].to_f < vertices_2[0]["x"].to_f
     if to_the_left
-      comp_1 = vertices_1[1]["x"]
-      comp_2 = vertices_2[0]["x"]
+      comp_1 = vertices_1[1]["x"].to_f
+      comp_2 = vertices_2[0]["x"].to_f
     else
-      comp_1 = vertices_1[0]["x"]
-      comp_2 = vertices_2[1]["x"]
+      comp_1 = vertices_1[0]["x"].to_f 
+      comp_2 = vertices_2[1]["x"].to_f
     end
     (comp_1 - comp_2).abs < (margin.abs * 2.5)
   end
@@ -145,26 +142,44 @@ class ReceiptDissector
       raise "Second argument must be either 'right' or 'left'"
     end
   end
-  
+
   private
 
   def fits_on_slope?(poly1, poly2)
-    balance_corners = poly2["boundingPoly"]["vertices"]
-    balance_bottom_left = balance_corners[2]
-    balance_bottom_right = balance_corners[3]
-    poly_bottom_left = poly1["boundingPoly"]["vertices"][2]
-
-    y1 = balance_bottom_left["y"].to_f
-    y2 = balance_bottom_right["y"].to_f
-    y3 = poly_bottom_left["y"].to_f
-    x1 = balance_bottom_left["x"].to_f
-    x2 = balance_bottom_right["x"].to_f
-    x3 = poly_bottom_left["x"].to_f
+    return false if is_vertical?(poly1) || is_vertical?(poly2)
+    first_poly_corners = poly1["boundingPoly"]["vertices"]
+    first_poly_bottom_left = first_poly_corners[2]
+    first_poly_bottom_right = first_poly_corners[3]
+    second_poly_bottom_left = poly2["boundingPoly"]["vertices"][2]
+    
+    y1 = first_poly_bottom_left["y"].to_f
+    y2 = first_poly_bottom_right["y"].to_f
+    y3 = second_poly_bottom_left["y"].to_f
+    x1 = first_poly_bottom_left["x"].to_f
+    x2 = first_poly_bottom_right["x"].to_f
+    x3 = second_poly_bottom_left["x"].to_f
     
     slope = (y2-y1) / (x2-x1)
     expected_y_value = y1 + slope * (x3 - x1)
     actual_error = (expected_y_value - y3).abs
     error_percentage = (actual_error / expected_y_value) * 100
     error_percentage <= ERROR_MARGIN
+  end
+
+  def is_vertical?(poly)
+    return false unless poly["description"].length > 1
+    vertices = poly["boundingPoly"]["vertices"]
+    if vertices[2]["y"].nil? || vertices[1]["x"].nil? || vertices[0]["x"].nil? || vertices[0]["y"].nil?
+      return true
+    end
+    (vertices[2]["y"] - vertices[0]["y"]).abs > (vertices[1]["x"] - vertices[0]["x"]).abs
+  end
+
+  def fits_within_vertical_box?(poly1, poly2)
+    vertices1 = poly1["boundingPoly"]["vertices"]
+    x_min = vertices1.min_by { |v| v["x"] }["x"]
+    x_max = vertices1.max_by { |v| v["x"] }["x"]
+
+    poly2["boundingPoly"]["vertices"].any? { |v| v["x"] >= x_min && v["x"] <= x_max }
   end
 end
