@@ -14,8 +14,9 @@ class DirectReporter
   def create_message(object_key)
     vision = VisionApiService.new(object_key)
     dissector = ReceiptDissector.new(vision.make_text_detection_http_call!)
+    dissector.parse_receipt
   
-    "I think that the total amount on this receipt is #{dissector.identify_total}. If that's not correct, take it up with Dyson."
+    "Here's a rundown of your receipt:\n\nTotal: #{dissector.balance || 'couldn\'t read'}\nSubtotal: #{dissector.subtotal || 'couldn\'t read'}\nTax: #{dissector.tax || 'couldn\'t read'}\n\nItems:#{dissector.items.map{ |item, price| "\n#{item}: #{price}" }}"
   end
 
   def fetch_phone_number(object_key)
